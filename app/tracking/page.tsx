@@ -29,63 +29,24 @@ export default function TrackingPage() {
     setLoading(false);
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "BARU":
+        return "bg-blue-600";
+      case "DIPROSES":
+        return "bg-yellow-500";
+      case "SELESAI":
+        return "bg-green-600";
+      case "DITOLAK":
+        return "bg-red-600";
+      default:
+        return "bg-slate-600";
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-3xl mx-auto bg-white rounded-xl p-8 shadow">
+    <main className="min-h-screen bg-slate-950 p-6 md:p-10">
+      <div className="max-w-4xl mx-auto">
 
-        <h1 className="text-3xl font-bold mb-6">
-          Tracking Tiket Aspirasi
-        </h1>
-
-        <div className="flex gap-3">
-          <input
-            value={ticket}
-            onChange={(e) => setTicket(e.target.value)}
-            placeholder="Masukkan nomor tiket"
-            className="flex-1 border p-3 rounded"
-          />
-
-          <button
-            onClick={handleSearch}
-            className="bg-blue-600 text-white px-6 rounded"
-          >
-            {loading ? "Mencari..." : "Cari"}
-          </button>
-        </div>
-
-        {result && (
-          <div className="mt-8 border rounded p-6 bg-slate-50">
-            <h2 className="text-xl font-bold mb-4">
-              Detail Aspirasi
-            </h2>
-
-            <p>
-              <b>No Tiket:</b> {result.ticket_no}
-            </p>
-
-            <p>
-              <b>Nama:</b> {result.nama}
-            </p>
-
-            <p>
-              <b>Jurusan:</b> {result.jurusan}
-            </p>
-
-            <p>
-              <b>Judul:</b> {result.judul}
-            </p>
-
-            <p>
-              <b>Status:</b> {result.status}
-            </p>
-
-            <p>
-              <b>Tanggal:</b>{" "}
-              {new Date(result.created_at).toLocaleString()}
-            </p>
-          </div>
-        )}
-      </div>
-    </main>
-  );
-}
+        <div className="mb-8">
+          <h1 className="
