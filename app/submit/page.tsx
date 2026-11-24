@@ -18,11 +18,9 @@ export default function SubmitPage() {
 
   const generateTicket = () => {
     const today = new Date();
-
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, "0");
     const dd = String(today.getDate()).padStart(2, "0");
-
     const random = Math.floor(Math.random() * 999999)
       .toString()
       .padStart(6, "0");
@@ -56,8 +54,8 @@ export default function SubmitPage() {
       ]);
 
     if (error) {
-      alert("Gagal menyimpan aspirasi");
       console.error(error);
+      alert("Gagal menyimpan aspirasi");
     } else {
       alert(
         `Aspirasi berhasil dikirim.\n\nNomor Tiket:\n${ticketNo}`
@@ -71,131 +69,199 @@ export default function SubmitPage() {
         judul: "",
         isi_aspirasi: "",
       });
+
+      setShowName(false);
     }
 
     setLoading(false);
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
-        <h1 className="text-3xl font-bold mb-6">
-          Kirim Aspirasi
-        </h1>
+    <main className="min-h-screen bg-slate-950 p-6 md:p-10">
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="max-w-4xl mx-auto">
 
-          <input
-            className="w-full border p-3 rounded"
-            placeholder="Nama"
-            value={form.nama}
-            onChange={(e) =>
-              setForm({ ...form, nama: e.target.value })
-            }
-            required
-          />
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white">
+            Kirim Aspirasi
+          </h1>
 
-<div>
-  <label className="block mb-2 font-medium">
-    Publikasi Identitas
-  </label>
+          <p className="text-slate-400 mt-2">
+            Sampaikan kritik, saran, masukan, atau keluhan untuk
+            Fakultas Teknik Universitas Indonesia.
+          </p>
+        </div>
 
-  <select
-    className="w-full border p-3 rounded"
-    value={showName ? "true" : "false"}
-    onChange={(e) =>
-      setShowName(e.target.value === "true")
-    }
-  >
-    <option value="false">
-      Anonim (Disarankan)
-    </option>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
 
-    <option value="true">
-      Tampilkan Nama Saya
-    </option>
-  </select>
+          <form onSubmit={handleSubmit} className="space-y-5">
 
-  <p className="text-sm text-gray-500 mt-1">
-    Nama hanya akan tampil pada Dashboard Aspirasi Publik jika Anda memilih opsi ini.
-  </p>
-</div>
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Nama
+              </label>
 
-          <input
-            className="w-full border p-3 rounded"
-            placeholder="Email"
-            type="email"
-            value={form.email}
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-          />
+              <input
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
+                placeholder="Nama Lengkap"
+                value={form.nama}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    nama: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
 
-          <input
-            className="w-full border p-3 rounded"
-            placeholder="No HP"
-            value={form.no_hp}
-            onChange={(e) =>
-              setForm({ ...form, no_hp: e.target.value })
-            }
-          />
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Publikasi Identitas
+              </label>
 
-          <select
-            className="w-full border p-3 rounded"
-            value={form.jurusan}
-            onChange={(e) =>
-              setForm({ ...form, jurusan: e.target.value })
-            }
-            required
-          >
-            <option value="">Pilih Jurusan</option>
-            <option>Teknik Sipil</option>
-            <option>Teknik Mesin</option>
-            <option>Teknik Elektro</option>
-            <option>Teknik Kimia</option>
-            <option>Teknik Industri</option>
-            <option>Teknik Komputer</option>
-            <option>Teknik Lingkungan</option>
-            <option>Teknik Perkapalan</option>
-            <option>Teknik Metalurgi dan Material</option>
-            <option>Arsitektur</option>
-            <option>Teknik Bioproses</option>
-          </select>
+              <select
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
+                value={showName ? "true" : "false"}
+                onChange={(e) =>
+                  setShowName(e.target.value === "true")
+                }
+              >
+                <option value="false">
+                  Anonim (Disarankan)
+                </option>
 
-          <input
-            className="w-full border p-3 rounded"
-            placeholder="Judul Aspirasi"
-            value={form.judul}
-            onChange={(e) =>
-              setForm({ ...form, judul: e.target.value })
-            }
-            required
-          />
+                <option value="true">
+                  Tampilkan Nama Saya
+                </option>
+              </select>
 
-          <textarea
-            className="w-full border p-3 rounded h-40"
-            placeholder="Sampaikan aspirasi Anda..."
-            value={form.isi_aspirasi}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                isi_aspirasi: e.target.value,
-              })
-            }
-            required
-          />
+              <p className="text-slate-400 text-sm mt-2">
+                Nama hanya akan tampil pada Dashboard Aspirasi Publik
+                apabila Anda memilih opsi ini.
+              </p>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white px-6 py-3 rounded"
-          >
-            {loading
-              ? "Mengirim..."
-              : "Kirim Aspirasi"}
-          </button>
-        </form>
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Email
+              </label>
+
+              <input
+                type="email"
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    email: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Nomor HP
+              </label>
+
+              <input
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
+                placeholder="08xxxxxxxxxx"
+                value={form.no_hp}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    no_hp: e.target.value,
+                  })
+                }
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Jurusan
+              </label>
+
+              <select
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
+                value={form.jurusan}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    jurusan: e.target.value,
+                  })
+                }
+                required
+              >
+                <option value="">Pilih Jurusan</option>
+                <option>Teknik Sipil</option>
+                <option>Teknik Mesin</option>
+                <option>Teknik Elektro</option>
+                <option>Teknik Kimia</option>
+                <option>Teknik Industri</option>
+                <option>Teknik Komputer</option>
+                <option>Teknik Lingkungan</option>
+                <option>Teknik Perkapalan</option>
+                <option>Teknik Metalurgi dan Material</option>
+                <option>Arsitektur</option>
+                <option>Teknik Bioproses</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Judul Aspirasi
+              </label>
+
+              <input
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
+                placeholder="Judul Aspirasi"
+                value={form.judul}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    judul: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-slate-300 mb-2">
+                Isi Aspirasi
+              </label>
+
+              <textarea
+                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl h-40"
+                placeholder="Tuliskan aspirasi Anda..."
+                value={form.isi_aspirasi}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    isi_aspirasi: e.target.value,
+                  })
+                }
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-4 rounded-xl shadow-xl hover:scale-[1.02] transition"
+            >
+              {loading
+                ? "Mengirim..."
+                : "🚀 Kirim Aspirasi"}
+            </button>
+
+          </form>
+        </div>
       </div>
+
     </main>
   );
 }
