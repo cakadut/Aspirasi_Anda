@@ -28,49 +28,56 @@ export default function SubmitPage() {
     return `${yyyy}${mm}${dd}-${random}`;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
 
     setLoading(true);
 
-    const ticketNo = generateTicket();
+    try {
+      const ticketNo = generateTicket();
 
-    const { error } = await supabase
-      .from("aspirations")
-      .insert([
-        {
-          ticket_no: ticketNo,
-          nama: form.nama,
-          email: form.email,
-          no_hp: form.no_hp,
-          jurusan: form.jurusan,
-          kategori: "Umum",
-          judul: form.judul,
-          isi_aspirasi: form.isi_aspirasi,
-          status: "BARU",
-          show_name: showName,
-          is_public: true,
-        },
-      ]);
+      const { error } = await supabase
+        .from("aspirations")
+        .insert([
+          {
+            ticket_no: ticketNo,
+            nama: form.nama,
+            email: form.email,
+            no_hp: form.no_hp,
+            jurusan: form.jurusan,
+            kategori: "Umum",
+            judul: form.judul,
+            isi_aspirasi: form.isi_aspirasi,
+            status: "BARU",
+            show_name: showName,
+            is_public: true,
+          },
+        ]);
 
-    if (error) {
-      console.error(error);
-      alert("Gagal menyimpan aspirasi");
-    } else {
-      alert(
-        `Aspirasi berhasil dikirim.\n\nNomor Tiket:\n${ticketNo}`
-      );
+      if (error) {
+        console.error(error);
+        alert("Gagal menyimpan aspirasi");
+      } else {
+        alert(
+          `Aspirasi berhasil dikirim.\n\nNomor Tiket:\n${ticketNo}`
+        );
 
-      setForm({
-        nama: "",
-        email: "",
-        no_hp: "",
-        jurusan: "",
-        judul: "",
-        isi_aspirasi: "",
-      });
+        setForm({
+          nama: "",
+          email: "",
+          no_hp: "",
+          jurusan: "",
+          judul: "",
+          isi_aspirasi: "",
+        });
 
-      setShowName(false);
+        setShowName(false);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan saat mengirim aspirasi");
     }
 
     setLoading(false);
@@ -78,30 +85,30 @@ export default function SubmitPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 p-6 md:p-10">
-
       <div className="max-w-4xl mx-auto">
-
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white">
-            Kirim Aspirasi
+            📝 Kirim Aspirasi
           </h1>
 
           <p className="text-slate-400 mt-2">
-            Sampaikan kritik, saran, masukan, atau keluhan untuk
-            Fakultas Teknik Universitas Indonesia.
+            Sampaikan kritik, saran, masukan, maupun keluhan
+            untuk Fakultas Teknik Universitas Indonesia.
           </p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
+          >
             <div>
               <label className="block text-slate-300 mb-2">
                 Nama
               </label>
 
               <input
+                type="text"
                 className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
                 placeholder="Nama Lengkap"
                 value={form.nama}
@@ -124,7 +131,9 @@ export default function SubmitPage() {
                 className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
                 value={showName ? "true" : "false"}
                 onChange={(e) =>
-                  setShowName(e.target.value === "true")
+                  setShowName(
+                    e.target.value === "true"
+                  )
                 }
               >
                 <option value="false">
@@ -137,8 +146,8 @@ export default function SubmitPage() {
               </select>
 
               <p className="text-slate-400 text-sm mt-2">
-                Nama hanya akan tampil pada Dashboard Aspirasi Publik
-                apabila Anda memilih opsi ini.
+                Nama hanya akan tampil pada dashboard
+                publik apabila Anda memilih opsi ini.
               </p>
             </div>
 
@@ -167,6 +176,7 @@ export default function SubmitPage() {
               </label>
 
               <input
+                type="text"
                 className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
                 placeholder="08xxxxxxxxxx"
                 value={form.no_hp}
@@ -195,7 +205,10 @@ export default function SubmitPage() {
                 }
                 required
               >
-                <option value="">Pilih Jurusan</option>
+                <option value="">
+                  Pilih Jurusan
+                </option>
+
                 <option>Teknik Sipil</option>
                 <option>Teknik Mesin</option>
                 <option>Teknik Elektro</option>
@@ -204,7 +217,9 @@ export default function SubmitPage() {
                 <option>Teknik Komputer</option>
                 <option>Teknik Lingkungan</option>
                 <option>Teknik Perkapalan</option>
-                <option>Teknik Metalurgi dan Material</option>
+                <option>
+                  Teknik Metalurgi dan Material
+                </option>
                 <option>Arsitektur</option>
                 <option>Teknik Bioproses</option>
               </select>
@@ -216,6 +231,7 @@ export default function SubmitPage() {
               </label>
 
               <input
+                type="text"
                 className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
                 placeholder="Judul Aspirasi"
                 value={form.judul}
@@ -251,17 +267,15 @@ export default function SubmitPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-4 rounded-xl shadow-xl hover:scale-[1.02] transition"
+              className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-4 rounded-xl shadow-xl hover:opacity-90 transition"
             >
               {loading
                 ? "Mengirim..."
                 : "🚀 Kirim Aspirasi"}
             </button>
-
           </form>
         </div>
       </div>
-
     </main>
   );
 }
