@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function SubmitPage() {
   const [loading, setLoading] = useState(false);
+  const [showName, setShowName] = useState(false);
 
   const [form, setForm] = useState({
     nama: "",
@@ -49,6 +50,8 @@ export default function SubmitPage() {
           judul: form.judul,
           isi_aspirasi: form.isi_aspirasi,
           status: "BARU",
+          show_name: showName,
+          is_public: true,
         },
       ]);
 
@@ -91,6 +94,32 @@ export default function SubmitPage() {
             }
             required
           />
+
+<div>
+  <label className="block mb-2 font-medium">
+    Publikasi Identitas
+  </label>
+
+  <select
+    className="w-full border p-3 rounded"
+    value={showName ? "true" : "false"}
+    onChange={(e) =>
+      setShowName(e.target.value === "true")
+    }
+  >
+    <option value="false">
+      Anonim (Disarankan)
+    </option>
+
+    <option value="true">
+      Tampilkan Nama Saya
+    </option>
+  </select>
+
+  <p className="text-sm text-gray-500 mt-1">
+    Nama hanya akan tampil pada Dashboard Aspirasi Publik jika Anda memilih opsi ini.
+  </p>
+</div>
 
           <input
             className="w-full border p-3 rounded"
