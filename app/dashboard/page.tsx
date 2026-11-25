@@ -12,90 +12,126 @@ export default function DashboardPage() {
   }, []);
 
   async function loadData() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("aspirations")
       .select("*")
       .eq("is_public", true)
       .order("created_at", { ascending: false });
 
-    if (!error) {
-      setData(data || []);
-    }
-
+    setData(data || []);
     setLoading(false);
   }
+
+  const total = data.length;
+  const baru = data.filter((x) => x.status === "BARU").length;
+  const proses = data.filter((x) => x.status === "DIPROSES").length;
+  const selesai = data.filter((x) => x.status === "SELESAI").length;
 
   const badgeColor = (status: string) => {
     switch (status) {
       case "SELESAI":
-        return "bg-green-600";
+        return "bg-green-500";
       case "DIPROSES":
         return "bg-yellow-500";
       case "DITOLAK":
-        return "bg-red-600";
+        return "bg-red-500";
       default:
-        return "bg-blue-600";
+        return "bg-blue-500";
     }
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6 md:p-10">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white p-6">
+      <div className="max-w-7xl mx-auto">
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-5xl font-bold">
             Dashboard Aspirasi
           </h1>
-
           <p className="text-slate-400 mt-2">
-            Aspirasi publik mahasiswa Fakultas Teknik UI
+            Statistik dan aspirasi publik mahasiswa Fakultas Teknik UI
           </p>
+        </div>
+
+        <div className="grid md:grid-cols-4 gap-4 mb-8">
+
+          <div className="bg-blue-600 rounded-2xl p-6 shadow-lg">
+            <div className="text-sm opacity-80">Total Aspirasi</div>
+            <div className="text-4xl font-bold mt-2">
+              {total}
+            </div>
+          </div>
+
+          <div className="bg-cyan-600 rounded-2xl p-6 shadow-lg">
+            <div className="text-sm opacity-80">Status Baru</div>
+            <div className="text-4xl font-bold mt-2">
+              {baru}
+            </div>
+          </div>
+
+          <div className="bg-yellow-500 rounded-2xl p-6 shadow-lg">
+            <div className="text-sm opacity-80">Diproses</div>
+            <div className="text-4xl font-bold mt-2">
+              {proses}
+            </div>
+          </div>
+
+          <div className="bg-green-600 rounded-2xl p-6 shadow-lg">
+            <div className="text-sm opacity-80">Selesai</div>
+            <div className="text-4xl font-bold mt-2">
+              {selesai}
+            </div>
+          </div>
+
         </div>
 
         {loading ? (
           <div className="bg-slate-900 rounded-2xl p-6">
             Memuat data...
           </div>
-        ) : data.length === 0 ? (
-          <div className="bg-slate-900 rounded-2xl p-6">
-            Belum ada aspirasi yang ditampilkan.
-          </div>
         ) : (
           <div className="grid gap-5">
+
             {data.map((item) => (
               <div
                 key={item.id}
-                className="bg-slate-900 border border-slate-800 rounded-2xl p-6"
+                className="bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 transition-all"
               >
-                <div className="flex justify-between items-center mb-3">
+                <div className="flex flex-wrap justify-between items-center gap-3">
+
                   <div>
-                    <h2 className="text-xl font-semibold">
+                    <h2 className="text-2xl font-bold">
                       {item.judul}
                     </h2>
 
-                    <div className="text-slate-400 text-sm">
-                      {item.ticket_no}
+                    <div className="text-slate-400 text-sm mt-1">
+                      Nomor Tiket : {item.ticket_no}
+                    </div>
+
+                    <div className="text-slate-500 text-sm">
+                      Jurusan : {item.jurusan}
                     </div>
                   </div>
 
                   <span
-                    className={`${badgeColor(item.status)} px-3 py-1 rounded-full text-sm`}
+                    className={`${badgeColor(item.status)} px-4 py-2 rounded-full text-sm font-semibold`}
                   >
                     {item.status}
                   </span>
+
                 </div>
 
-                <p className="text-slate-300">
+                <div className="border-t border-slate-800 my-4" />
+
+                <p className="text-slate-300 leading-relaxed">
                   {item.deskripsi}
                 </p>
-
-                <div className="mt-4 text-sm text-slate-500">
-                  {item.jurusan}
-                </div>
               </div>
             ))}
+
           </div>
         )}
+
       </div>
     </main>
   );
