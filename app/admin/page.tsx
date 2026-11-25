@@ -44,7 +44,7 @@ export default function AdminDashboard() {
 
     setSaving(false);
 
-    loadData();
+    await loadData();
 
     alert("Data berhasil disimpan");
   }
@@ -65,19 +65,9 @@ export default function AdminDashboard() {
   }, [data, search, statusFilter]);
 
   const total = data.length;
-
-  const baru = data.filter(
-    (x) => x.status === "BARU"
-  ).length;
-
-  const diproses = data.filter(
-    (x) => x.status === "DIPROSES"
-  ).length;
-
-  const selesai = data.filter(
-    (x) => x.status === "SELESAI"
-  ).length;
-
+  const baru = data.filter((x) => x.status === "BARU").length;
+  const diproses = data.filter((x) => x.status === "DIPROSES").length;
+  const selesai = data.filter((x) => x.status === "SELESAI").length;
   const klarifikasi = data.filter(
     (x) => x.status === "MENUNGGU_KLARIFIKASI"
   ).length;
@@ -86,19 +76,14 @@ export default function AdminDashboard() {
     switch (status) {
       case "BARU":
         return "bg-blue-600";
-
       case "DIPROSES":
         return "bg-yellow-500";
-
       case "SELESAI":
         return "bg-green-600";
-
       case "DITOLAK":
         return "bg-red-600";
-
       case "MENUNGGU_KLARIFIKASI":
         return "bg-orange-500";
-
       default:
         return "bg-slate-600";
     }
@@ -122,35 +107,35 @@ export default function AdminDashboard() {
 
           <div className="bg-blue-600 rounded-3xl p-6">
             <div>Total</div>
-            <div className="text-4xl font-bold">
+            <div className="text-4xl font-bold mt-2">
               {total}
             </div>
           </div>
 
           <div className="bg-cyan-600 rounded-3xl p-6">
             <div>Baru</div>
-            <div className="text-4xl font-bold">
+            <div className="text-4xl font-bold mt-2">
               {baru}
             </div>
           </div>
 
           <div className="bg-yellow-500 rounded-3xl p-6">
             <div>Diproses</div>
-            <div className="text-4xl font-bold">
+            <div className="text-4xl font-bold mt-2">
               {diproses}
             </div>
           </div>
 
           <div className="bg-orange-500 rounded-3xl p-6">
             <div>Klarifikasi</div>
-            <div className="text-4xl font-bold">
+            <div className="text-4xl font-bold mt-2">
               {klarifikasi}
             </div>
           </div>
 
           <div className="bg-green-600 rounded-3xl p-6">
             <div>Selesai</div>
-            <div className="text-4xl font-bold">
+            <div className="text-4xl font-bold mt-2">
               {selesai}
             </div>
           </div>
@@ -164,24 +149,20 @@ export default function AdminDashboard() {
             <input
               placeholder="Cari tiket atau judul"
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
+              onChange={(e) => setSearch(e.target.value)}
               className="bg-slate-800 p-3 rounded-xl"
             />
 
             <select
               value={statusFilter}
-              onChange={(e) =>
-                setStatusFilter(e.target.value)
-              }
+              onChange={(e) => setStatusFilter(e.target.value)}
               className="bg-slate-800 p-3 rounded-xl"
             >
               <option value="SEMUA">SEMUA</option>
               <option value="BARU">BARU</option>
               <option value="DIPROSES">DIPROSES</option>
               <option value="MENUNGGU_KLARIFIKASI">
-                MENUNGGU_KLARIFIKASI
+                MENUNGGU KLARIFIKASI
               </option>
               <option value="SELESAI">SELESAI</option>
               <option value="DITOLAK">DITOLAK</option>
@@ -189,7 +170,7 @@ export default function AdminDashboard() {
 
             <button
               onClick={loadData}
-              className="bg-blue-600 rounded-xl"
+              className="bg-blue-600 rounded-xl font-semibold"
             >
               Refresh
             </button>
@@ -198,55 +179,59 @@ export default function AdminDashboard() {
 
         </div>
 
-        <div className="grid gap-4">
+        {loading ? (
+          <div className="bg-slate-900 rounded-3xl p-8 text-center">
+            Memuat data...
+          </div>
+        ) : (
+          <div className="grid gap-4">
 
-          {filteredData.map((item) => (
+            {filteredData.map((item) => (
 
-            <div
-              key={item.id}
-              onClick={() => setSelected(item)}
-              className="cursor-pointer bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500"
-            >
+              <div
+                key={item.id}
+                onClick={() => setSelected(item)}
+                className="cursor-pointer bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-blue-500 transition-all duration-300"
+              >
 
-              <div className="flex justify-between flex-wrap gap-4">
+                <div className="flex items-center justify-between flex-wrap gap-4">
 
-                <div>
+                  <div>
+                    <h2 className="text-2xl font-bold">
+                      {item.judul}
+                    </h2>
 
-                  <h2 className="text-xl font-bold">
-                    {item.judul}
-                  </h2>
+                    <div className="text-slate-400 mt-2">
+                      {item.ticket_no}
+                    </div>
 
-                  <div className="text-slate-400 mt-2">
-                    {item.ticket_no}
+                    <div className="text-slate-500">
+                      {item.jurusan}
+                    </div>
                   </div>
 
-                  <div className="text-slate-500">
-                    {item.jurusan}
-                  </div>
+                  <span
+                    className={`${badgeColor(
+                      item.status
+                    )} min-w-[220px] h-14 flex items-center justify-center rounded-full text-white font-bold text-sm text-center px-6 shadow-lg`}
+                  >
+                    {item.status.replaceAll("_", " ")}
+                  </span>
 
                 </div>
 
-                <span
-                  className={`${badgeColor(
-                    item.status
-                  )} px-4 py-2 rounded-full`}
-                >
-                  {item.status}
-                </span>
-
               </div>
 
-            </div>
+            ))}
 
-          ))}
-
-        </div>
+          </div>
+        )}
 
         {selected && (
 
           <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
 
-            <div className="bg-slate-900 w-full max-w-4xl rounded-3xl p-6">
+            <div className="bg-slate-900 w-full max-w-4xl rounded-3xl p-6 border border-slate-700">
 
               <div className="flex justify-between items-center mb-6">
 
@@ -255,17 +240,15 @@ export default function AdminDashboard() {
                 </h2>
 
                 <button
-                  onClick={() =>
-                    setSelected(null)
-                  }
-                  className="bg-red-600 px-4 py-2 rounded-xl"
+                  onClick={() => setSelected(null)}
+                  className="bg-red-600 px-6 py-3 rounded-xl font-semibold"
                 >
                   Tutup
                 </button>
 
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
 
                 <div>
                   <div className="text-slate-400">
@@ -306,7 +289,6 @@ export default function AdminDashboard() {
                   <div className="text-slate-400">
                     Isi Aspirasi
                   </div>
-
                   <div className="whitespace-pre-wrap">
                     {selected.isi_aspirasi}
                   </div>
@@ -322,11 +304,13 @@ export default function AdminDashboard() {
                   }
                   className="bg-slate-800 p-3 rounded-xl w-full"
                 >
-                  <option>BARU</option>
-                  <option>DIPROSES</option>
-                  <option>MENUNGGU_KLARIFIKASI</option>
-                  <option>SELESAI</option>
-                  <option>DITOLAK</option>
+                  <option value="BARU">BARU</option>
+                  <option value="DIPROSES">DIPROSES</option>
+                  <option value="MENUNGGU_KLARIFIKASI">
+                    MENUNGGU_KLARIFIKASI
+                  </option>
+                  <option value="SELESAI">SELESAI</option>
+                  <option value="DITOLAK">DITOLAK</option>
                 </select>
 
                 <textarea
@@ -335,8 +319,7 @@ export default function AdminDashboard() {
                   onChange={(e) =>
                     setSelected({
                       ...selected,
-                      admin_note:
-                        e.target.value,
+                      admin_note: e.target.value,
                     })
                   }
                   placeholder="Tanggapan admin..."
@@ -346,7 +329,7 @@ export default function AdminDashboard() {
                 <button
                   disabled={saving}
                   onClick={saveData}
-                  className="bg-green-600 px-6 py-3 rounded-xl font-bold"
+                  className="bg-green-600 px-8 py-3 rounded-xl font-bold"
                 >
                   {saving
                     ? "Menyimpan..."
