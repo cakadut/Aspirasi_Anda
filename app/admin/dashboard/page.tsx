@@ -1,109 +1,90 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function AdminDashboard() {
-  const [data, setData] = useState<any[]>([]);
+export default function DashboardPage() {
+  const [aspirasi, setAspirasi] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const loadData = async () => {
-    const { data, error } = await supabase
-      .from("aspirations")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!error && data) {
-      setData(data);
-    }
-
-    setLoading(false);
-  };
-
-  const updateStatus = async (
-    id: string,
-    status: string
-  ) => {
-    await supabase
-      .from("aspirations")
-      .update({ status })
-      .eq("id", id);
-
-    loadData();
-  };
 
   useEffect(() => {
     loadData();
   }, []);
 
+  async function loadData() {
+    const { data, error } = await supabase
+      .from("aspirasi")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (!error) {
+      setAspirasi(data || []);
+    }
+
+    setLoading(false);
+  }
+
+  function statusColor(status: string) {
+    switch (status) {
+      case "Selesai":
+        return "bg-green-600";
+      case "Diproses":
+        return "bg-yellow-500";
+      default:
+        return "bg-blue-600";
+    }
+  }
+
   return (
-    <main className="min-h-screen p-8 bg-slate-100">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-slate-900 text-white p-8">
+      <h1 className="text-4xl font-bold mb-6">
+        Dashboard Aspirasi
+      </h1>
 
-        <h1 className="text-4xl font-bold mb-6">
-          Dashboard Admin
-        </h1>
+      <p className="mb-8 text-gray-300">
+        Daftar Aspirasi Mahasiswa FTUI
+      </p>
 
-        {loading && <p>Loading...</p>}
-
-        <div className="bg-white rounded-xl shadow overflow-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-slate-200">
-                <th className="p-3">Tiket</th>
-                <th className="p-3">Nama</th>
-                <th className="p-3">Jurusan</th>
-                <th className="p-3">Judul</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {data.map((item) => (
-                <tr key={item.id}>
-                  <td className="p-3">
-                    {item.ticket_no}
-                  </td>
-
-                  <td className="p-3">
-                    {item.nama}
-                  </td>
-
-                  <td className="p-3">
-                    {item.jurusan}
-                  </td>
-
-                  <td className="p-3">
-                    {item.judul}
-                  </td>
-
-                  <td className="p-3">
-                    <select
-                      value={item.status}
-                      onChange={(e) =>
-                        updateStatus(
-                          item.id,
-                          e.target.value
-                        )
-                      }
-                      className="border p-2 rounded"
-                    >
-                      <option>BARU</option>
-                      <option>DIPROSES</option>
-                      <option>MENUNGGU_KLARIFIKASI</option>
-                      <option>SELESAI</option>
-                      <option>DITOLAK</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {loading ? (
+        <p>Loading...</p>
+      ) : aspirasi.length === 0 ? (
+        <div className="bg-slate-800 p-6 rounded-xl">
+          Belum ada aspirasi yang ditampilkan.
         </div>
+      ) : (
+        <div className="grid gap-4">
+          {aspirasi.map((item) => (
+            <div
+              key={item.id}
+              className="bg-slate-800 rounded-xl p-5 border border-slate-700"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    {item.judul}
+                  </h2>
 
-      </div>
-    </main>
+                  <p className="text-gray-400 text-sm">
+                    {item.ticket_number}
+                  </p>
+                </div>
+
+                <span
+                  className={`px-3 py-1 rounded-full text-sm ${statusColor(
+                    item.status
+                  )}`}
+                >
+                  {item.status}
+                </span>
+              </div>
+
+              <p className="mt-4 text-gray-300">
+                {item.deskripsi}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
