@@ -8,7 +8,7 @@ export const metadata = {
   icons: { apple: "/icon-192" },
   appleWebApp: { capable: true, title: "AspirasiAnda" },
   description:
-    "Sistem Aspirasi Mahasiswa Fakultas Teknik Universitas Indonesia",
+    "Sistem Aspirasi Mahasiswa Fakultas Teknik",
 };
 
 export default function RootLayout({
@@ -86,7 +86,7 @@ export default function RootLayout({
             </h3>
 
             <p className="text-slate-400">
-              Sistem Aspirasi Mahasiswa Fakultas Teknik Universitas Indonesia
+              Sistem Aspirasi Mahasiswa Fakultas Teknik
             </p>
 
             <p className="text-slate-500 text-sm mt-3">
@@ -94,7 +94,7 @@ export default function RootLayout({
             </p>
 
             <p className="text-slate-600 text-sm mt-4">
-              © 2026 Fakultas Teknik Universitas Indonesia
+              © 2026 Fakultas Teknik
             </p>
           </div>
         </footer>
