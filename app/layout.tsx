@@ -40,7 +40,7 @@ export default function RootLayout({
                 </Link>
 
                 <Link
-                  href="/kirim"
+                  href="/submit"
                   className="px-4 py-2 rounded-xl hover:bg-slate-800 transition"
                 >
                   Kirim Aspirasi
