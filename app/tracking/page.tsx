@@ -21,7 +21,6 @@ export default function TrackingPage() {
 
     if (error) {
       setResult(null);
-      alert("Nomor tiket tidak ditemukan");
     } else {
       setResult(data);
     }
@@ -45,121 +44,157 @@ export default function TrackingPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 p-6 md:p-10">
-      <div className="max-w-4xl mx-auto">
-
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white">
-            🎫 Tracking Tiket Aspirasi
+    <main className="min-h-screen bg-slate-950 text-white px-6 py-10">
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-10">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">
+            🎫 Tracking Aspirasi
           </h1>
 
-          <p className="text-slate-400 mt-2">
+          <p className="text-slate-400">
             Masukkan nomor tiket untuk melihat perkembangan aspirasi Anda.
           </p>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
-
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
           <div className="flex flex-col md:flex-row gap-3">
-
             <input
               value={ticket}
               onChange={(e) => setTicket(e.target.value)}
-              placeholder="Contoh: 20261124-123456"
-              className="flex-1 bg-slate-800 border border-slate-700 text-white p-4 rounded-xl"
+              placeholder="Contoh: 20261123-927455"
+              className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500"
             />
 
             <button
               onClick={handleSearch}
-              className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition"
+              className="bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-4 rounded-xl font-bold hover:opacity-90 transition"
             >
-              {loading ? "Mencari..." : "🔍 Cari"}
+              {loading ? "Mencari..." : "🔍 Cari Tiket"}
             </button>
-
           </div>
 
+          {!loading && ticket && !result && (
+            <div className="mt-6 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-4">
+              Nomor tiket tidak ditemukan.
+            </div>
+          )}
+
           {result && (
-            <div className="mt-8 bg-slate-800 border border-slate-700 rounded-2xl p-6">
+            <div className="mt-8">
+              <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6">
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                  <div>
+                    <p className="text-slate-400 text-sm">
+                      Nomor Tiket
+                    </p>
 
-              <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
-                <h2 className="text-2xl font-bold text-white">
-                  Detail Aspirasi
-                </h2>
-
-                <span
-                  className={`${getStatusColor(
-                    result.status
-                  )} text-white px-4 py-2 rounded-full text-sm font-bold`}
-                >
-                  {result.status}
-                </span>
-              </div>
-
-              <div className="space-y-4">
-
-                <div>
-                  <div className="text-slate-400 text-sm">
-                    Nomor Tiket
+                    <h2 className="text-2xl font-bold text-cyan-400">
+                      {result.ticket_no}
+                    </h2>
                   </div>
-                  <div className="text-white font-semibold">
-                    {result.ticket_no}
+
+                  <span
+                    className={`${getStatusColor(
+                      result.status
+                    )} px-5 py-2 rounded-full font-bold`}
+                  >
+                    {result.status}
+                  </span>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-slate-400 text-sm">
+                      Nama Pengirim
+                    </p>
+
+                    <p className="font-semibold">
+                      {result.show_name
+                        ? result.nama
+                        : "Anonim"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-slate-400 text-sm">
+                      Jurusan
+                    </p>
+
+                    <p>{result.jurusan}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-slate-400 text-sm">
+                      Kategori
+                    </p>
+
+                    <p>{result.kategori}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-slate-400 text-sm">
+                      Tanggal Pengiriman
+                    </p>
+
+                    <p>
+                      {new Date(
+                        result.created_at
+                      ).toLocaleString("id-ID")}
+                    </p>
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-slate-400 text-sm">
-                    Nama
-                  </div>
-                  <div className="text-white">
-                    {result.show_name
-                      ? result.nama
-                      : "Anonim"}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-slate-400 text-sm">
-                    Jurusan
-                  </div>
-                  <div className="text-white">
-                    {result.jurusan}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-slate-400 text-sm">
+                <div className="mt-6">
+                  <p className="text-slate-400 text-sm mb-2">
                     Judul Aspirasi
-                  </div>
-                  <div className="text-white">
+                  </p>
+
+                  <p className="font-semibold text-lg">
                     {result.judul}
-                  </div>
+                  </p>
                 </div>
 
-                <div>
-                  <div className="text-slate-400 text-sm">
+                <div className="mt-6">
+                  <p className="text-slate-400 text-sm mb-2">
                     Isi Aspirasi
-                  </div>
-                  <div className="text-white whitespace-pre-wrap">
+                  </p>
+
+                  <div className="bg-slate-900 rounded-xl p-4 border border-slate-700 whitespace-pre-wrap">
                     {result.isi_aspirasi}
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-slate-400 text-sm">
-                    Tanggal Pengiriman
-                  </div>
-                  <div className="text-white">
-                    {new Date(
-                      result.created_at
-                    ).toLocaleString("id-ID")}
+                <div className="mt-6">
+                  <p className="text-slate-400 text-sm mb-2">
+                    Catatan Admin
+                  </p>
+
+                  <div className="bg-slate-900 rounded-xl p-4 border border-slate-700">
+                    {result.admin_note ||
+                      "Belum ada catatan dari admin."}
                   </div>
                 </div>
 
-              </div>
+                <div className="mt-8 grid md:grid-cols-4 gap-3">
+                  <div className="bg-blue-600/20 border border-blue-600/30 rounded-xl p-3 text-center">
+                    BARU
+                  </div>
 
+                  <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-xl p-3 text-center">
+                    DIPROSES
+                  </div>
+
+                  <div className="bg-green-600/20 border border-green-600/30 rounded-xl p-3 text-center">
+                    SELESAI
+                  </div>
+
+                  <div className="bg-red-600/20 border border-red-600/30 rounded-xl p-3 text-center">
+                    DITOLAK
+                  </div>
+                </div>
+              </div>
             </div>
           )}
-
         </div>
       </div>
     </main>
