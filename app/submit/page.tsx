@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function SubmitPage() {
   const [loading, setLoading] = useState(false);
+  const [showName, setShowName] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   useEffect(() => { supabase.from("categories").select("name").eq("is_active", true).order("name").then(({data,error}) => { if(error) alert("Kategori gagal dimuat"); else setCategories((data || []).map(x => x.name)); }); }, []);
 
@@ -26,7 +27,7 @@ export default function SubmitPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.rpc("submit_aspiration_public", { p_student_name: form.nama, p_student_number: form.npm, p_faculty_program: form.jurusan, p_category: form.kategori, p_title: form.judul, p_description: form.isi_aspirasi });
+      const { data, error } = await supabase.rpc("submit_aspiration_with_visibility", { p_student_name: form.nama, p_student_number: form.npm, p_faculty_program: form.jurusan, p_category: form.kategori, p_title: form.judul, p_description: form.isi_aspirasi, p_show_name: showName });
       const ticketNo = data?.[0]?.ticket_code;
 
       if (error) {
@@ -37,6 +38,7 @@ export default function SubmitPage() {
           `Aspirasi berhasil dikirim.\n\nNomor Tiket:\n${ticketNo}`
         );
 
+        setShowName(false);
         setForm({
           nama: "",
           npm: "",
@@ -98,9 +100,10 @@ export default function SubmitPage() {
             <div>
               <label className="block text-slate-300 mb-2">No. NPM *</label>
               <input type="text" inputMode="numeric" pattern="[0-9]{4,40}" required value={form.npm} onChange={e => setForm({...form,npm:e.target.value})} className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl" placeholder="Nomor Pokok Mahasiswa" />
-              <p className="text-slate-400 text-sm mt-2">Nama, NPM dan program studi hanya untuk verifikasi admin, tidak ditampilkan kepada publik.</p>
+              <p className="text-slate-400 text-sm mt-2">NPM dan program studi hanya untuk verifikasi admin. Nama ditampilkan sesuai pilihan Anda.</p>
             </div>
             <div>
+              <fieldset className="space-y-2 mb-5 text-slate-300"><legend>Publikasi nama</legend><label className="block"><input type="radio" name="visibility" checked={!showName} onChange={()=>setShowName(false)} /> Anonim (disarankan)</label><label className="block"><input type="radio" name="visibility" checked={showName} onChange={()=>setShowName(true)} /> Tampilkan nama saya jika aspirasi dipublikasikan</label></fieldset>
               <label className="block text-slate-300 mb-2">Kategori *</label>
               <select required value={form.kategori} onChange={e=>setForm({...form,kategori:e.target.value})} className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"><option value="">Pilih kategori</option>{categories.map(x=><option key={x}>{x}</option>)}</select>
             </div>
