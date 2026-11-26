@@ -1,32 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function SubmitPage() {
   const [loading, setLoading] = useState(false);
   const [showName, setShowName] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  useEffect(() => { supabase.from("categories").select("name").eq("is_active", true).order("name").then(({data,error}) => { if(error) alert("Kategori gagal dimuat"); else setCategories((data || []).map(x => x.name)); }); }, []);
 
   const [form, setForm] = useState({
     nama: "",
-    email: "",
-    no_hp: "",
+    npm: "",
+    kategori: "",
     jurusan: "",
     judul: "",
     isi_aspirasi: "",
   });
 
-  const generateTicket = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    const random = Math.floor(Math.random() * 999999)
-      .toString()
-      .padStart(6, "0");
-
-    return `${yyyy}${mm}${dd}-${random}`;
-  };
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -36,25 +27,8 @@ export default function SubmitPage() {
     setLoading(true);
 
     try {
-      const ticketNo = generateTicket();
-
-      const { error } = await supabase
-        .from("aspirations")
-        .insert([
-          {
-            ticket_no: ticketNo,
-            nama: form.nama,
-            email: form.email,
-            no_hp: form.no_hp,
-            jurusan: form.jurusan,
-            kategori: "Umum",
-            judul: form.judul,
-            isi_aspirasi: form.isi_aspirasi,
-            status: "BARU",
-            show_name: showName,
-            is_public: true,
-          },
-        ]);
+      const { data, error } = await supabase.rpc("submit_aspiration_with_visibility", { p_student_name: form.nama, p_student_number: form.npm, p_faculty_program: form.jurusan, p_category: form.kategori, p_title: form.judul, p_description: form.isi_aspirasi, p_show_name: showName });
+      const ticketNo = data?.[0]?.ticket_code;
 
       if (error) {
         console.error(error);
@@ -64,16 +38,17 @@ export default function SubmitPage() {
           `Aspirasi berhasil dikirim.\n\nNomor Tiket:\n${ticketNo}`
         );
 
+        setShowName(false);
         setForm({
           nama: "",
-          email: "",
-          no_hp: "",
+          npm: "",
+          kategori: "",
           jurusan: "",
           judul: "",
           isi_aspirasi: "",
         });
 
-        setShowName(false);
+
       }
     } catch (err) {
       console.error(err);
@@ -123,72 +98,15 @@ export default function SubmitPage() {
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-2">
-                Publikasi Identitas
-              </label>
-
-              <select
-                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
-                value={showName ? "true" : "false"}
-                onChange={(e) =>
-                  setShowName(
-                    e.target.value === "true"
-                  )
-                }
-              >
-                <option value="false">
-                  Anonim (Disarankan)
-                </option>
-
-                <option value="true">
-                  Tampilkan Nama Saya
-                </option>
-              </select>
-
-              <p className="text-slate-400 text-sm mt-2">
-                Nama hanya akan tampil pada dashboard
-                publik apabila Anda memilih opsi ini.
-              </p>
+              <label className="block text-slate-300 mb-2">No. NPM *</label>
+              <input type="text" inputMode="numeric" pattern="[0-9]{4,40}" required value={form.npm} onChange={e => setForm({...form,npm:e.target.value})} className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl" placeholder="Nomor Pokok Mahasiswa" />
+              <p className="text-slate-400 text-sm mt-2">NPM dan program studi hanya untuk verifikasi admin. Nama ditampilkan sesuai pilihan Anda.</p>
             </div>
-
             <div>
-              <label className="block text-slate-300 mb-2">
-                Email
-              </label>
-
-              <input
-                type="email"
-                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    email: e.target.value,
-                  })
-                }
-              />
+              <fieldset className="space-y-2 mb-5 text-slate-300"><legend>Publikasi nama</legend><label className="block"><input type="radio" name="visibility" checked={!showName} onChange={()=>setShowName(false)} /> Anonim (disarankan)</label><label className="block"><input type="radio" name="visibility" checked={showName} onChange={()=>setShowName(true)} /> Tampilkan nama saya jika aspirasi dipublikasikan</label></fieldset>
+              <label className="block text-slate-300 mb-2">Kategori *</label>
+              <select required value={form.kategori} onChange={e=>setForm({...form,kategori:e.target.value})} className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"><option value="">Pilih kategori</option>{categories.map(x=><option key={x}>{x}</option>)}</select>
             </div>
-
-            <div>
-              <label className="block text-slate-300 mb-2">
-                Nomor HP
-              </label>
-
-              <input
-                type="text"
-                className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
-                placeholder="08xxxxxxxxxx"
-                value={form.no_hp}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    no_hp: e.target.value,
-                  })
-                }
-              />
-            </div>
-
             <div>
               <label className="block text-slate-300 mb-2">
                 Jurusan
@@ -233,7 +151,7 @@ export default function SubmitPage() {
               <input
                 type="text"
                 className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl"
-                placeholder="Judul Aspirasi"
+                minLength={5} maxLength={120} placeholder="Judul Aspirasi"
                 value={form.judul}
                 onChange={(e) =>
                   setForm({
@@ -252,7 +170,7 @@ export default function SubmitPage() {
 
               <textarea
                 className="w-full bg-slate-800 border border-slate-700 text-white p-3 rounded-xl h-40"
-                placeholder="Tuliskan aspirasi Anda..."
+                minLength={20} maxLength={10000} placeholder="Tuliskan aspirasi Anda..."
                 value={form.isi_aspirasi}
                 onChange={(e) =>
                   setForm({

@@ -31,12 +31,12 @@ export default function RootLayout({
                 </span>
               </Link>
 
-              <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="campus-nav flex flex-wrap items-center justify-center gap-2">
                 <Link
                   href="/"
                   className="px-4 py-2 rounded-xl hover:bg-slate-800 transition"
                 >
-                  Home
+                  Beranda
                 </Link>
 
                 <Link
@@ -61,7 +61,7 @@ export default function RootLayout({
                 </Link>
 
                 <Link
-                  href="/login"
+                  href="/admin/login"
                   className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 transition font-semibold"
                 >
                   Admin

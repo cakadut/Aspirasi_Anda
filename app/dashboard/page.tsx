@@ -27,10 +27,10 @@ export default function DashboardPage() {
     if (search) {
       result = result.filter(
         (item) =>
-          item.judul
+          item.title
             ?.toLowerCase()
             .includes(search.toLowerCase()) ||
-          item.ticket_no
+          item.ticket_code
             ?.toLowerCase()
             .includes(search.toLowerCase())
       );
@@ -43,10 +43,9 @@ export default function DashboardPage() {
     setLoading(true);
 
     const { data, error } = await supabase
-      .from("aspirations")
-      .select("*")
-      .eq("is_public", true)
-      .order("created_at", { ascending: false });
+      .from("public_aspirations")
+      .select("ticket_code,title,category,status,submitted_at,updated_at,public_progress,display_name")
+      .order("submitted_at", { ascending: false });
 
     if (!error) {
       setData(data || []);
@@ -58,37 +57,37 @@ export default function DashboardPage() {
 
   const total = data.length;
   const baru = data.filter(
-    (x) => x.status === "BARU"
+    (x) => x.status === "submit"
   ).length;
 
   const proses = data.filter(
-    (x) => x.status === "DIPROSES"
+    (x) => x.status === "diproses"
   ).length;
 
   const klarifikasi = data.filter(
-    (x) => x.status === "MENUNGGU_KLARIFIKASI"
+    (x) => x.status === "diterima"
   ).length;
 
   const selesai = data.filter(
-    (x) => x.status === "SELESAI"
+    (x) => x.status === "selesai"
   ).length;
 
   const ditolak = data.filter(
-    (x) => x.status === "DITOLAK"
+    (x) => x.status === "ditolak"
   ).length;
 
   const badgeColor = (status: string) => {
     switch (status) {
-      case "SELESAI":
+      case "selesai":
         return "bg-green-600";
 
-      case "DIPROSES":
+      case "diproses":
         return "bg-yellow-500";
 
-      case "DITOLAK":
+      case "ditolak":
         return "bg-red-600";
 
-      case "MENUNGGU_KLARIFIKASI":
+      case "diterima":
         return "bg-orange-500";
 
       default:
@@ -134,7 +133,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="bg-orange-600 rounded-3xl p-6 shadow-xl">
-            <div>Klarifikasi</div>
+            <div>Diterima</div>
             <div className="text-4xl font-bold mt-2">
               {klarifikasi}
             </div>
@@ -177,20 +176,20 @@ export default function DashboardPage() {
               <option value="SEMUA">
                 Semua Status
               </option>
-              <option value="BARU">
-                BARU
+              <option value="submit">
+                submit
               </option>
-              <option value="DIPROSES">
-                DIPROSES
+              <option value="diproses">
+                diproses
               </option>
-              <option value="MENUNGGU_KLARIFIKASI">
-                MENUNGGU KLARIFIKASI
+              <option value="diterima">
+                DITERIMA
               </option>
-              <option value="SELESAI">
-                SELESAI
+              <option value="selesai">
+                selesai
               </option>
-              <option value="DITOLAK">
-                DITOLAK
+              <option value="ditolak">
+                ditolak
               </option>
             </select>
           </div>
@@ -223,26 +222,26 @@ export default function DashboardPage() {
 
             {filtered.map((item) => (
               <div
-                key={item.id}
+                key={item.ticket_code}
                 onClick={() => setSelected(item)}
                 className="cursor-pointer bg-slate-900 border border-slate-800 rounded-3xl p-6 hover:border-cyan-500 hover:shadow-xl transition-all"
               >
                 <div className="flex flex-wrap justify-between gap-4">
                   <div>
                     <h2 className="text-2xl font-bold">
-                      {item.judul}
+                      {item.title}
                     </h2>
 
                     <div className="text-slate-400 mt-2">
                       Nomor Tiket :
                       {" "}
-                      {item.ticket_no}
+                      {item.ticket_code}
                     </div>
 
                     <div className="text-slate-500">
-                      Jurusan :
+                      Pengirim :
                       {" "}
-                      {item.jurusan}
+                      {item.display_name}
                     </div>
                   </div>
 
@@ -282,7 +281,7 @@ export default function DashboardPage() {
                   <div className="text-slate-400">
                     Nomor Tiket
                   </div>
-                  <div>{selected.ticket_no}</div>
+                  <div>{selected.ticket_code}</div>
                 </div>
 
                 <div>
@@ -290,9 +289,7 @@ export default function DashboardPage() {
                     Pengirim
                   </div>
                   <div>
-                    {selected.show_name
-                      ? selected.nama
-                      : "Anonim"}
+                    {selected.display_name}
                   </div>
                 </div>
 
@@ -302,7 +299,7 @@ export default function DashboardPage() {
                   </div>
                   <div>
                     {new Date(
-                      selected.created_at
+                      selected.submitted_at
                     ).toLocaleString("id-ID")}
                   </div>
                 </div>
@@ -311,32 +308,19 @@ export default function DashboardPage() {
                   <div className="text-slate-400">
                     Judul
                   </div>
-                  <div>{selected.judul}</div>
+                  <div>{selected.title}</div>
                 </div>
 
-                <div>
-                  <div className="text-slate-400">
-                    Jurusan
-                  </div>
-                  <div>{selected.jurusan}</div>
-                </div>
+                
 
                 <div>
                   <div className="text-slate-400">
                     Kategori
                   </div>
-                  <div>{selected.kategori}</div>
+                  <div>{selected.category}</div>
                 </div>
 
-                <div>
-                  <div className="text-slate-400">
-                    Isi Aspirasi
-                  </div>
-
-                  <div className="whitespace-pre-wrap bg-slate-800 p-4 rounded-xl mt-2">
-                    {selected.isi_aspirasi}
-                  </div>
-                </div>
+                
 
                 <div>
                   <div className="text-slate-400">
@@ -358,20 +342,12 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="bg-slate-800 p-4 rounded-xl mt-2">
-                    {selected.admin_note ||
+                    {selected.public_progress ||
                       "Belum ada tanggapan admin"}
                   </div>
                 </div>
 
-                {selected.lampiran && (
-                  <a
-                    href={selected.lampiran}
-                    target="_blank"
-                    className="inline-block bg-blue-600 hover:bg-blue-500 px-5 py-3 rounded-xl font-semibold"
-                  >
-                    📎 Lihat Lampiran
-                  </a>
-                )}
+               
               </div>
             </div>
           </div>

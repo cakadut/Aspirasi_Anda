@@ -14,19 +14,21 @@ export default function DashboardPage() {
   async function loadData() {
     setLoading(true);
 
-    const { data, error } = await supabase
-      .from("aspirations")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { data, error } = await supabase.rpc("admin_list_aspirations_v2");
 
     if (error) {
-      console.error(error);
+      setAspirasi([]); await supabase.auth.signOut(); window.location.replace("/admin/login"); return;
     }
 
     setAspirasi(data || []);
     setLoading(false);
   }
 
+  async function save(item: any) {
+    const {error}=await supabase.rpc("admin_update_aspiration_v2",{p_id:item.id,p_status:item.status,p_public_progress:item.public_progress || "",p_private_admin_note:item.private_admin_note || "",p_is_published:item.is_published,p_assigned_to:item.assigned_to || ""});
+    if(error) alert(error.message); else {alert("Perubahan tersimpan"); await loadData();}
+  }
+  function edit(id:string,field:string,value:string|boolean){setAspirasi(prev=>prev.map(x=>x.id===id?{...x,[field]:value}:x));}
   function statusColor(status: string) {
     switch ((status || "").toUpperCase()) {
       case "SELESAI":
@@ -45,7 +47,7 @@ export default function DashboardPage() {
   const total = aspirasi.length;
 
   const baru = aspirasi.filter(
-    (x) => (x.status || "").toUpperCase() === "BARU"
+    (x) => (x.status || "").toUpperCase() === "SUBMIT"
   ).length;
 
   const diproses = aspirasi.filter(
@@ -70,6 +72,7 @@ export default function DashboardPage() {
             </p>
           </div>
 
+          <button onClick={async()=>{await supabase.auth.signOut();window.location.replace("/admin/login");}} className="bg-slate-700 px-5 py-3 rounded-xl">Keluar</button>
           <button
             onClick={loadData}
             className="bg-cyan-600 hover:bg-cyan-500 px-5 py-3 rounded-xl font-semibold"
@@ -135,38 +138,42 @@ export default function DashboardPage() {
 
                   <div className="flex-1">
                     <h2 className="text-2xl font-semibold">
-                      {item.judul}
+                      {item.title}
                     </h2>
 
                     <p className="text-cyan-400 mt-2">
-                      {item.ticket_no}
+                      {item.ticket_code}
                     </p>
 
                     <p className="text-slate-400 mt-2">
-                      {item.show_name
-                        ? item.nama
-                        : "Anonim"}
+                      {item.student_name}
                     </p>
 
                     <p className="text-slate-500">
-                      {item.jurusan}
+                      {item.faculty_program} · NPM: {item.student_number}
                     </p>
 
                     <div className="mt-4 bg-slate-800 rounded-xl p-4">
-                      {item.isi_aspirasi}
+                      {item.description}
                     </div>
 
-                    {item.admin_note && (
+                    {item.private_admin_note && (
                       <div className="mt-4 bg-slate-700 rounded-xl p-4">
                         <div className="font-semibold mb-2">
                           Catatan Admin
                         </div>
-                        {item.admin_note}
+                        {item.private_admin_note}
                       </div>
                     )}
                   </div>
 
-                  <div>
+                  <div className="space-y-3 flex flex-col">
+                    <select className="bg-slate-800 p-3 rounded-xl" value={item.status} onChange={e=>edit(item.id,"status",e.target.value)}>{["submit","diterima","diproses","selesai","ditolak"].map(s=><option key={s}>{s}</option>)}</select>
+                    <input className="bg-slate-800 p-3 rounded-xl" placeholder="Departemen / pihak terkait" value={item.assigned_to||""} onChange={e=>edit(item.id,"assigned_to",e.target.value)}/>
+                    <textarea className="bg-slate-800 p-3 rounded-xl" placeholder="Progres publik (tanpa identitas)" value={item.public_progress||""} onChange={e=>edit(item.id,"public_progress",e.target.value)}/>
+                    <textarea className="bg-slate-800 p-3 rounded-xl" placeholder="Catatan internal admin" value={item.private_admin_note||""} onChange={e=>edit(item.id,"private_admin_note",e.target.value)}/>
+                    <label><input type="checkbox" checked={item.is_published} onChange={e=>edit(item.id,"is_published",e.target.checked)}/> Publikasikan aspirasi</label>
+                    <button className="bg-cyan-600 p-3 rounded-xl" onClick={()=>save(item)}>Simpan perubahan</button>
                     <span
                       className={`px-4 py-2 rounded-full text-sm text-white ${statusColor(
                         item.status

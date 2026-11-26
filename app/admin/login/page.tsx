@@ -1,23 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [visible, setVisible] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      username === "admin" &&
-      password === "qwerty@123"
-    ) {
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email: username.trim(), password });
+      if (error) { alert("Email atau password salah"); return; }
+      const check = await supabase.rpc("admin_list_aspirations_v2");
+      if (check.error) { await supabase.auth.signOut(); alert("Akses admin tidak diizinkan"); return; }
       window.location.href = "/admin/dashboard";
-      return;
-    }
-
-    alert("Username atau Password salah");
+    } finally { setBusy(false); }
   };
 
   return (
@@ -41,12 +43,12 @@ export default function LoginPage() {
 
             <div>
               <label className="block mb-2 text-slate-300">
-                Username
+                Email
               </label>
 
               <input
-                type="text"
-                placeholder="Masukkan Username"
+                type="email"
+                placeholder="Masukkan Email"
                 value={username}
                 onChange={(e) =>
                   setUsername(e.target.value)
@@ -62,7 +64,7 @@ export default function LoginPage() {
               </label>
 
               <input
-                type="password"
+                type={visible ? "text" : "password"}
                 placeholder="Masukkan Password"
                 value={password}
                 onChange={(e) =>
@@ -73,7 +75,9 @@ export default function LoginPage() {
               />
             </div>
 
+            <button type="button" onClick={() => setVisible(!visible)} className="text-cyan-400">{visible ? "Sembunyikan password" : "Tampilkan password"}</button>
             <button
+              disabled={busy}
               type="submit"
               className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-4 rounded-xl font-bold text-white hover:opacity-90 transition"
             >
@@ -81,11 +85,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-500">
-            Username : admin
-            <br />
-            Password : qwerty@123
-          </div>
+
         </div>
       </div>
     </main>
