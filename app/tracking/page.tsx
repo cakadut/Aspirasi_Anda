@@ -7,17 +7,15 @@ export default function TrackingPage() {
   const [ticket, setTicket] = useState("");
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [searched,setSearched]=useState(false);
 
   const handleSearch = async () => {
     if (!ticket) return;
 
-    setLoading(true);
+    setLoading(true); setSearched(true);
 
     const { data, error } = await supabase
-      .from("aspirations")
-      .select("*")
-      .eq("ticket_no", ticket)
-      .single();
+      .rpc("track_aspiration_public", {p_ticket_code:ticket.trim()}).maybeSingle();
 
     if (error) {
       setResult(null);
@@ -30,13 +28,13 @@ export default function TrackingPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "BARU":
+      case "submit":
         return "bg-blue-600";
-      case "DIPROSES":
+      case "diproses":
         return "bg-yellow-500";
-      case "SELESAI":
+      case "selesai":
         return "bg-green-600";
-      case "DITOLAK":
+      case "ditolak":
         return "bg-red-600";
       default:
         return "bg-slate-600";
@@ -61,7 +59,7 @@ export default function TrackingPage() {
             <input
               value={ticket}
               onChange={(e) => setTicket(e.target.value)}
-              placeholder="Contoh: 20261123-927455"
+              placeholder="Contoh: 20261123-92745"
               className="flex-1 bg-slate-800 border border-slate-700 rounded-xl p-4 text-white focus:outline-none focus:border-cyan-500"
             />
 
@@ -73,7 +71,7 @@ export default function TrackingPage() {
             </button>
           </div>
 
-          {!loading && ticket && !result && (
+          {!loading && searched && !result && (
             <div className="mt-6 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl p-4">
               Nomor tiket tidak ditemukan.
             </div>
@@ -89,7 +87,7 @@ export default function TrackingPage() {
                     </p>
 
                     <h2 className="text-2xl font-bold text-cyan-400">
-                      {result.ticket_no}
+                      {result.ticket_code}
                     </h2>
                   </div>
 
@@ -103,32 +101,14 @@ export default function TrackingPage() {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-slate-400 text-sm">
-                      Nama Pengirim
-                    </p>
-
-                    <p className="font-semibold">
-                      {result.show_name
-                        ? result.nama
-                        : "Anonim"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-slate-400 text-sm">
-                      Jurusan
-                    </p>
-
-                    <p>{result.jurusan}</p>
-                  </div>
+                  
 
                   <div>
                     <p className="text-slate-400 text-sm">
                       Kategori
                     </p>
 
-                    <p>{result.kategori}</p>
+                    <p>{result.category}</p>
                   </div>
 
                   <div>
@@ -138,7 +118,7 @@ export default function TrackingPage() {
 
                     <p>
                       {new Date(
-                        result.created_at
+                        result.submitted_at
                       ).toLocaleString("id-ID")}
                     </p>
                   </div>
@@ -150,46 +130,38 @@ export default function TrackingPage() {
                   </p>
 
                   <p className="font-semibold text-lg">
-                    {result.judul}
+                    {result.title}
                   </p>
                 </div>
 
-                <div className="mt-6">
-                  <p className="text-slate-400 text-sm mb-2">
-                    Isi Aspirasi
-                  </p>
-
-                  <div className="bg-slate-900 rounded-xl p-4 border border-slate-700 whitespace-pre-wrap">
-                    {result.isi_aspirasi}
-                  </div>
-                </div>
+                
 
                 <div className="mt-6">
                   <p className="text-slate-400 text-sm mb-2">
-                    Catatan Admin
+                    Progres publik
                   </p>
 
                   <div className="bg-slate-900 rounded-xl p-4 border border-slate-700">
-                    {result.admin_note ||
+                    {result.public_progress ||
                       "Belum ada catatan dari admin."}
                   </div>
                 </div>
 
                 <div className="mt-8 grid md:grid-cols-4 gap-3">
                   <div className="bg-blue-600/20 border border-blue-600/30 rounded-xl p-3 text-center">
-                    BARU
+                    submit
                   </div>
 
                   <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-xl p-3 text-center">
-                    DIPROSES
+                    diproses
                   </div>
 
                   <div className="bg-green-600/20 border border-green-600/30 rounded-xl p-3 text-center">
-                    SELESAI
+                    selesai
                   </div>
 
                   <div className="bg-red-600/20 border border-red-600/30 rounded-xl p-3 text-center">
-                    DITOLAK
+                    ditolak
                   </div>
                 </div>
               </div>
