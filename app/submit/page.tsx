@@ -68,7 +68,7 @@ export default function SubmitPage() {
 
           <p className="text-slate-400 mt-2">
             Sampaikan kritik, saran, masukan, maupun keluhan
-            untuk Fakultas Teknik Universitas Indonesia.
+            untuk Fakultas Teknik.
           </p>
         </div>
 
