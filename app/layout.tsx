@@ -1,9 +1,12 @@
 import "./globals.css";
+import PwaRegister from "./pwa-register";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 export const metadata = {
   title: "AspirasiAnda",
+  icons: { apple: "/icon-192" },
+  appleWebApp: { capable: true, title: "AspirasiAnda" },
   description:
     "Sistem Aspirasi Mahasiswa Fakultas Teknik Universitas Indonesia",
 };
@@ -16,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className="min-h-screen bg-slate-950 text-white">
+        <PwaRegister />
         {/* NAVBAR */}
         <nav className="sticky top-0 z-50 backdrop-blur-lg bg-slate-950/90 border-b border-slate-800">
           <div className="max-w-7xl mx-auto px-4">

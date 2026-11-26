@@ -6,6 +6,10 @@ import { supabase } from "@/lib/supabase";
 export default function DashboardPage() {
   const [aspirasi, setAspirasi] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [email,setEmail]=useState("");
+  const [memberMessage,setMemberMessage]=useState("");
+  const [adding,setAdding]=useState(false);
+  async function addMember(e: React.FormEvent){e.preventDefault();setAdding(true);setMemberMessage("");try {const {error}=await supabase.rpc("admin_add_member",{p_email:email.trim()});setMemberMessage(error?error.message:"Administrator berhasil ditambahkan.");if(!error)setEmail("");}finally{setAdding(false);}}
 
   useEffect(() => {
     loadData();
@@ -119,6 +123,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        <form onSubmit={addMember} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 mb-8 space-y-3"><h2 className="text-xl font-bold">Tambah administrator</h2><p className="text-slate-400 text-sm">Akun harus sudah dibuat dan dikonfirmasi di Supabase Authentication.</p><div className="flex flex-col sm:flex-row gap-3"><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email administrator" className="bg-slate-800 rounded-xl p-3 flex-1 min-w-0"/><button disabled={adding} className="bg-cyan-700 rounded-xl px-5 py-3">{adding?"Memproses...":"Tambah admin"}</button></div><p role="status">{memberMessage}</p></form>
         {loading ? (
           <div className="bg-slate-900 rounded-2xl p-6">
             Memuat data...
