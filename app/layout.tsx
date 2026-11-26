@@ -61,7 +61,7 @@ export default function RootLayout({
                 </Link>
 
                 <Link
-                  href="/admin"
+                  href="/login"
                   className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 transition font-semibold"
                 >
                   Admin
