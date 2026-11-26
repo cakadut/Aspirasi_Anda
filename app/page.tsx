@@ -1,6 +1,11 @@
+"use client";
+import {useEffect,useState} from "react";
+import {supabase} from "@/lib/supabase";
 import Link from "next/link";
 
 export default function Home() {
+ const [stats,setStats]=useState<{total:number,process:number,done:number}|null>(null);
+ useEffect(()=>{supabase.from("public_aspirations").select("status").then(({data,error})=>{if(!error && data)setStats({total:data.length,process:data.filter(x=>x.status==="diproses").length,done:data.filter(x=>x.status==="selesai").length});});},[]);
   return (
     <main className="min-h-screen bg-slate-950 text-white">
 
@@ -50,24 +55,24 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-6 -mt-10 relative z-10">
         <div className="grid md:grid-cols-4 gap-6">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
-            <p className="text-slate-400 text-sm">Total Aspirasi</p>
-            <h2 className="text-4xl font-bold text-cyan-400 mt-3">0</h2>
+            <p className="text-slate-400 text-sm">Total Aspirasi Publik</p>
+            <h2 className="text-4xl font-bold text-cyan-400 mt-3">{stats?.total ?? "—"}</h2>
           </div>
 
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
             <p className="text-slate-400 text-sm">Sedang Diproses</p>
-            <h2 className="text-4xl font-bold text-yellow-400 mt-3">0</h2>
+            <h2 className="text-4xl font-bold text-yellow-400 mt-3">{stats?.process ?? "—"}</h2>
           </div>
 
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
             <p className="text-slate-400 text-sm">Aspirasi Selesai</p>
-            <h2 className="text-4xl font-bold text-green-400 mt-3">0</h2>
+            <h2 className="text-4xl font-bold text-green-400 mt-3">{stats?.done ?? "—"}</h2>
           </div>
 
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
             <p className="text-slate-400 text-sm">Status Sistem</p>
             <h2 className="text-3xl font-bold text-green-400 mt-3">
-              ONLINE
+              {stats ? "ONLINE" : "—"}
             </h2>
           </div>
         </div>
