@@ -104,7 +104,7 @@ export default function DashboardPage() {
           </h1>
 
           <p className="text-slate-400 mt-3">
-            Aspirasi Publik Mahasiswa Fakultas Teknik Universitas Indonesia
+            Aspirasi Publik Mahasiswa Fakultas Teknik
           </p>
         </div>
 
